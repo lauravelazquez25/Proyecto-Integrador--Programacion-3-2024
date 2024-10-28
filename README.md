@@ -64,8 +64,8 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
 Para ejecutar el sistema de gestión de cobranzas, utiliza el siguiente comando:
 
   ```
-   cd /directorio_del_proyecto
-   ```
+  python control_cobranzas.py
+  ```
    
 ## Menú interactivo 
    
