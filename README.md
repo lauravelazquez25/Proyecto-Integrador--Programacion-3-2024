@@ -19,86 +19,70 @@ Crear las relaciones entre las tablas
 Ingresar al menos 5 registros de ejemplo en cada una de las tablas
 Además, se debe integrar las bases de datos de todos los grupos en una única base de datos.
 
-### Grupo 1:
-Diseñar el procesamiento de los ESTACIONAMIENTOS:
-• Diseñar las Altas de Estacionamientos con los siguientes atributos: ID (código único), fecha y hora de ingreso, fecha y hora de egreso, y estado (por ejemplo: vacío, ocupado, reservado).
+# Proyecto de Gestión de Cobranzas
 
-• Diseñar las Bajas de Estacionamientos.
+Este proyecto permite gestionar cobranzas en un sistema de estacionamiento. Incluye funcionalidades para registrar, eliminar, modificar y consultar cobranzas en una base de datos SQLite.
 
-•Diseñar las Modificaciones de Estacionamientos.
+## Características
 
-• Diseñar las Consultas de Estacionamientos.
+- **Registro de Cobranzas**: Añade nuevas cobranzas con información detallada.
+- **Eliminación de Cobranzas**: Elimina registros específicos de cobranzas.
+- **Modificación de Cobranzas**: Actualiza los detalles de una cobranza ya registrada.
+- **Consulta de Cobranzas**: Permite visualizar todas las cobranzas registradas o consultar una específica por su ID.
+- **Interfaz de Línea de Comandos (CLI)**: Un menú interactivo que permite al usuario acceder a las funcionalidades del sistema.
 
-Tenga en cuenta las Relaciones:
-• Un estacionamiento está asociado a un usuario, pero un usuario puede tener varios estacionamientos activos (ocupado o reservado).
+## Requisitos
 
-•Un estacionamiento es realizado por un empleado, pero un empleado puede realizar varios estacionamientos.
+Antes de comenzar, asegúrate de tener instalado lo siguiente:
 
-• Un estacionamiento genera una cobranza, pero una cobranza puede incluir varios estacionamientos.
+- **Python 3.6 o superior**: Este proyecto utiliza Python, así que necesitarás tenerlo instalado en tu sistema. Puedes verificar si tienes Python instalado con el siguiente comando:
 
-### Grupo 2:
-Diseñar el procesamiento de los USUARIOS:
-• Diseñar las Altas de Usuarios con los siguientes atributos: ID (código único), nombre, dirección, teléfono y correo electrónico.
+  ```bash
+  python --version
+  ```
+- **SQLite**: Este proyecto utiliza SQLite como base de datos. SQLite ya viene incluido en Python, por lo que no se necesita instalar nada adicional.
 
-•Diseñar las Bajas de Usuarios.
+## Instalación
 
-•Diseñar las Modificaciones de Usuarios.
+1. Clona este repositorio en tu maquina local: 
 
-•Diseñar las Consultas de Usuarios.
+   ```
+   git clone https://github.com/lauravelazquez25/Proyecto-Integrador--Programacion-3-2024.git
+   ```
+2. Accede al directorio
 
-Tenga en cuenta las Relaciones:
+   ```
+   cd /directorio_del_proyecto
+   ```
+3. Crea la base de datos: 
+    Si el archivo de la base de datos "estacionamiento.db" no existe en el directorio, el script la generará automaticamente cuando se ejecute por primera vez.
+    
 
-•Un estacionamiento está asociado a un usuario, pero un usuario puede tener varios estacionamientos activos.
+## Uso
 
-•Un usuario está suscripto a una membresía, y a una membresía pueden suscribirse muchos usuarios.
 
-### Grupo 3:
-Diseñar el procesamiento de los EMPLEADOS:
+Para ejecutar el sistema de gestión de cobranzas, utiliza el siguiente comando:
 
-•Diseñar las Altas de Empleados con los siguientes atributos: ID (código único), nombre, cargo y fecha de contratación.
+  ```
+   cd /directorio_del_proyecto
+   ```
+   
+## Menú interactivo 
+   
+Al ejecutar el script, verás un menú con las siguientes opciones:
 
-•Diseñar las Bajas de Empleados.
+1. Registrar Cobranza: Permite añadir una nueva cobranza al sistema.
+2. Eliminar Cobranza: Elimina una cobranza del sistema utilizando su ID.
+3. Modificar Cobranza: Actualiza los datos de una cobranza específica.
+4. Consultar Todas las Cobranzas: Muestra todas las cobranzas registradas.
+5. Consultar Cobranza por ID: Busca y muestra una cobranza específica por su ID.
+6. Salir: Cierra el sistema de gestión de cobranzas.
 
-•Diseñar las Modificaciones de Empleados.
+### Ejemplo de Uso
 
-•Diseñar las Consultas de Empleados.
+1. Registrar Cobranza:
+    -Ingresa el monto, la moneda (ARS/USD/EUR) y el ID del empleado cuando se te solicite.
 
-Tenga en cuenta las Relaciones:
-
-•Un estacionamiento es realizado por un empleado, pero un empleado puede realizar varios estacionamientos.
-
-•Una reserva es realizada por un empleado, pero un empleado puede realizar varias reservas.
-
-### Grupo 4:
-Diseñar el procesamiento de las COBRANZAS:
-
-•Diseñar las Altas de Cobranzas con los siguientes atributos: ID (código único), monto, moneda, fecha y hora.
-
-•Diseñar las Bajas de Cobranzas.
-
-•Diseñar las Modificaciones de Cobranzas.
-
-•Diseñar las Consultas de Cobranzas.
-
-Tenga en cuenta las Relaciones:
-
-•Una cobranza es realizada por un empleado, pero un empleado puede realizar varias cobranzas.
-
-### Todos:
-
-•Elaborar el Diseño de Altas, Bajas, Modificaciones y Consultas del SG de Estacionamiento. Asimismo, deben integrar las tres partes para obtener un diseño único.
-
-•Elaborar el Programa para la Gestión del Estacionamiento según lo diseñado.
-
-Además de Estacionamientos, Usuarios, Empleados y Cobranzas, intervienen las siguientes entidades:
-
-### ESPACIOS que incluyen los atributos: ID (código único), ancho, largo, altura, ubicación y cantidad disponible.
-
-### VEHÍCULOS con los atributos: Patente (código único).
-
-### MEMBRESÍA de usuarios con los atributos: ID (código único), tipo de membresía y fecha de vencimiento.
-
-### PRECIOS de estacionamiento con los atributos: ID (código único), tiempo en horas, monto, moneda.
-
-Notas:
-Asuma todo lo que crea conveniente; si considera necesario, puede agregar otros atributos en las entidades.
+2. Consultar Cobranza por ID:
+    -Ingresa el ID de la cobranza que deseas consultar y se mostrará en pantalla.  
+   
