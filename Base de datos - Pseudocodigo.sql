@@ -1,5 +1,5 @@
 TABLE Empleados (
-        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        DNI INTEGER PRIMARY KEY AUTOINCREMENT,
         Nombre TEXT NOT NULL,
         Cargo TEXT NOT NULL,
         Fecha_Contratacion TEXT NOT NULL
@@ -29,7 +29,7 @@ TABLE Estacionamientos (
         Usuario_ID INTEGER NOT NULL,
         Empleado_ID INTEGER NOT NULL,
         Cobranza_ID INTEGER,
-        FOREIGN KEY (Usuario_ID) REFERENCES Usuarios(ID),
-        FOREIGN KEY (Empleado_ID) REFERENCES Empleados(ID),
+        FOREIGN KEY (Usuario_ID) REFERENCES Usuarios(DNI),
+        FOREIGN KEY (Empleado_ID) REFERENCES Empleados(DNI),
         FOREIGN KEY (Cobranza_ID) REFERENCES Cobranzas(ID)
     )
