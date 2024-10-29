@@ -15,7 +15,7 @@ TABLE Cobranzas (
     )
 
 TABLE Usuarios (
-        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        DNI INTEGER PRIMARY KEY AUTOINCREMENT,
         Nombre TEXT NOT NULL,
         Apellido TEXT NOT NULL,
         Membresia TEXT
