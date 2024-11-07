@@ -82,6 +82,7 @@ def menu_cobranzas():
             break
         else:
             print("Opción inválida, por favor intente de nuevo.")
+            
 
 if __name__ == "__main__":
     menu_cobranzas()
