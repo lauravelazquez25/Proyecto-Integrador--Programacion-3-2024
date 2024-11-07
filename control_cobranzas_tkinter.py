@@ -52,6 +52,14 @@ def consultar_cobranza_por_id(cobranza_id):
         print(f"No se encontro ninguna cobranza con ID {cobranza_id}.")
 
 
+def centrar_ventana(ventana):
+    ventana.update_idletasks()
+    ancho = ventana.winfo_width()
+    alto = ventana.winfo_height()
+    x = (ventana.winfo_screenwidth() // 2) - (ancho // 2)
+    y = (ventana.winfo_screenheight() // 2) - (alto // 2)
+    ventana.geometry(f"{ancho}x{alto}+{x}+{y}")
+
 def menu_login():
     def login_verify():
         username1 = username_verify.get()
@@ -78,6 +86,7 @@ def menu_login():
     ventana_login = tk.Tk()
     ventana_login.title("Control Cobranzas v1.0")
     ventana_login.geometry("300x250")
+    centrar_ventana(ventana_login)
     Label(ventana_login, text = "Por favor ingrese sus datos para continuar.").pack()
     Label(ventana_login, text = "").pack()
 
@@ -179,6 +188,7 @@ def menu_cobranzas():
         menu_agregar.geometry("300x200")
         menu_agregar.columnconfigure(0, weight=1)
         menu_agregar.columnconfigure(1, weight=1)
+        centrar_ventana(menu_agregar)
         Label(menu_agregar, text = "Ingrese los datos de la nueva cobranza", justify=tk.CENTER).grid(row=0, column=0, columnspan=2, pady=5,padx=5)
         
         matricula = StringVar()
@@ -218,7 +228,7 @@ def menu_cobranzas():
         
 
         # ----- Comienzo ------
-        id_cobranza = simpledialog.askstring("Eliminar Cobranza", "ID de la cobranza a modificar:")
+        id_cobranza = simpledialog.askstring("Modificar Cobranza", "ID de la cobranza a modificar:", parent=menu)
         if id_cobranza is None:
             return
         cobranza = consultar_cobranza_por_id(id_cobranza)
@@ -226,6 +236,7 @@ def menu_cobranzas():
             menu_modificar = Toplevel(menu)
             menu_modificar.title("Modificar Cobranza")
             menu_modificar.geometry("300x200")
+            centrar_ventana(menu_modificar)
             Label(menu_modificar, text = "Ingrese los nuevos datos de la cobranza a modificar", justify=tk.CENTER).grid(row=0, column=0, columnspan=3, pady=5,padx=5)
             
             monto = StringVar()
@@ -275,7 +286,7 @@ def menu_cobranzas():
             buscar_todos()
                 
         # ----- Comienzo ------
-        id_cobranza = simpledialog.askstring("Eliminar Cobranza", "ID de la cobranza a eliminar:")
+        id_cobranza = simpledialog.askstring("Eliminar Cobranza", "ID de la cobranza a eliminar:",parent=menu)
         if id_cobranza is None:
             return
         cobranza = consultar_cobranza_por_id(id_cobranza)
@@ -284,6 +295,8 @@ def menu_cobranzas():
             #Ventana emergente
             ventana_confirmacion = tk.Toplevel(menu)
             ventana_confirmacion.geometry("500x150")
+            centrar_ventana(ventana_confirmacion)
+
             ventana_confirmacion.title("Confirmar Eliminación")
 
             # Botones y texto
@@ -308,6 +321,7 @@ def menu_cobranzas():
     menu = tk.Tk()
     menu.title("Cobranzas!!!")
     menu.geometry("600x400")
+    centrar_ventana(menu)
 
     Label(menu, text="Gestion Cobranzas",font="Helvetica",justify="center",).pack()
 
