@@ -25,7 +25,8 @@ def setup_database():
     # Crear tabla Cobranzas (actualizada)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Cobranzas (
-        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        ID TEXT PRIMARY KEY,
+        Matricula TEXT NOT NULL,
         Monto REAL NOT NULL,
         Moneda TEXT NOT NULL,
         Fecha_Hora TEXT NOT NULL,
@@ -63,6 +64,20 @@ def setup_database():
     ''')
     print("Tabla 'Estacionamientos' creada o ya existe.")
     
+    
+    #Trigger para generar la ID de las cobranzas
+    cursor.execute('''
+    CREATE TRIGGER IF NOT EXISTS trigger_generate_cobranza_id
+    BEFORE INSERT ON Cobranzas
+    FOR EACH ROW
+    BEGIN
+        UPDATE Cobranzas
+        SET ID = NEW.Matricula || '_' || strftime('%Y%m%d%H%M', NEW.Fecha_Hora)
+        WHERE rowid = NEW.rowid;
+    END;
+    ''')
+    print("Tabla 'Estacionamientos' creada o ya existe.")
+    
     conn.commit()
     
     # Insertar ejemplos de empleados con nuevos campos
@@ -93,18 +108,25 @@ def setup_database():
 
     # Insertar ejemplos de cobranzas
     monedas = ['ARS', 'USD', 'EUR']
+    matriculas = [
+    'ABC123', 'DEF456', 'GHI789', 'JKL012', 'MNO345', 
+    'PQR678', 'STU901', 'VWX234', 'YZA567', 'BCD890', 
+    'EFG321', 'HIJ654', 'KLM987', 'NOP210', 'QRS543', 
+    'TUV876', 'WXY109', 'ZAB432', 'CDE765', 'FGH098'
+    ]
     empleados_ids = [i + 1 for i in range(10)]  # Asumimos que los empleados tienen IDs del 1 al 10
     
     for _ in range(10):
         monto = round(random.uniform(100, 1000), 2)
         moneda = random.choice(monedas)
+        matricula = random.choice(matriculas)
         fecha_hora = (datetime.now() - timedelta(days=random.randint(1, 30))).strftime("%Y-%m-%d %H:%M:%S")
         empleado_id = random.choice(empleados_ids)
         
         cursor.execute("""
-        INSERT INTO Cobranzas (Monto, Moneda, Fecha_Hora, Empleado_ID)
-        VALUES (?, ?, ?, ?)
-        """, (monto, moneda, fecha_hora, empleado_id))
+        INSERT INTO Cobranzas (Matricula, Monto, Moneda, Fecha_Hora, Empleado_ID)
+        VALUES (?, ?, ?, ?, ?)
+        """, (matricula, monto, moneda, fecha_hora, empleado_id))
     
     conn.commit()
 
