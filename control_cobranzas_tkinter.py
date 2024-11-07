@@ -10,7 +10,7 @@ cursor = conn.cursor()
 def alta_cobranza(matricula,monto, moneda, empleado_id):
     fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute("""
-    INSERT INTO Cobranzas (Monto, Moneda, Fecha_Hora, Empleado_ID)
+    INSERT INTO Cobranzas (Matricula, Monto, Moneda, Fecha_Hora, Empleado_ID)
     VALUES (?, ?, ?, ?, ?)
     """, (matricula, monto, moneda, fecha_hora, empleado_id))
     conn.commit()
