@@ -25,7 +25,7 @@ def setup_database():
     # Crear tabla Cobranzas (actualizada)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Cobranzas (
-        ID TEXT PRIMARY KEY,
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
         Matricula TEXT NOT NULL,
         Monto REAL NOT NULL,
         Moneda TEXT NOT NULL,
