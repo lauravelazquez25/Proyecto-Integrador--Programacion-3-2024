@@ -114,7 +114,18 @@ def setup_database():
     'EFG321', 'HIJ654', 'KLM987', 'NOP210', 'QRS543', 
     'TUV876', 'WXY109', 'ZAB432', 'CDE765', 'FGH098'
     ]
-    empleados_ids = [i + 1 for i in range(10)]  # Asumimos que los empleados tienen IDs del 1 al 10
+    empleados_ids = [
+    '12345678',
+    '23456789',
+    '34567890',
+    '45678901',
+    '56789012',
+    '67890123',
+    '78901234',
+    '89012345',
+    '90123456',
+    '12345679'
+]
     
     for _ in range(10):
         monto = round(random.uniform(100, 1000), 2)
