@@ -385,10 +385,12 @@ def menu_cobranzas():
 
     def pagar():
         id_cobranza = simpledialog.askstring("Pagar Cobranza", "ID de la cobranza a pagar:", parent=menu)
+        pago_correcto = True
         if id_cobranza is None:
             return
         cobranza = consultar_cobranza_por_id(id_cobranza)
-        if(cobranza and cobranza[6] == 'Sin pagar' and cobranza[3] is not None):
+        #pago_correcto = cobrar_estacionamiento(cobranza[2]) # Descomentar para trabajar con el otro modulo de cobranzas
+        if(cobranza and cobranza[6] == 'Sin pagar' and cobranza[2] is not None and pago_correcto):
             pagar_cobranza(id_cobranza)
             limpiar_tabla()
             buscar_todos_disponibles()
