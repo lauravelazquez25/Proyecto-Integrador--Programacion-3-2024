@@ -38,6 +38,17 @@ def setup_database():
     """)
     print("Tabla 'Empleados' creada o ya existe.")
 
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Empleado_Contraseña (
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        Empleado_ID INTEGER NOT NULL UNIQUE,
+        Password TEXT NOT NULL,
+        Permisos INTEGER NOT NULL CHECK(Permisos BETWEEN 0 AND 3),
+        FOREIGN KEY (Empleado_ID) REFERENCES Empleados(DNI)
+    )
+    ''')
+    conn.commit()
+
     # Crear tabla Usuarios (sin cambios adicionales)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Usuarios (

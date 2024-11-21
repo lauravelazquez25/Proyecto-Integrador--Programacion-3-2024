@@ -5,6 +5,7 @@ from tkcalendar import DateEntry
 from datetime import datetime
 import os
 import math
+import bcrypt
 
 conn = sqlite3.connect('estacionamiento.db')
 cursor = conn.cursor()
@@ -146,6 +147,15 @@ def consultar_cobranza_por_id(referencia):
     else:
         print(f"No se encontro ninguna cobranza con ID {referencia}.")
 
+def consultar_empleado_por_id(referencia):
+    cursor.execute('SELECT * FROM empleados WHERE DNI LIKE ?', (referencia,))
+    result = cursor.fetchone()
+    if result:
+        return result
+    else:
+        print(f"No se encontro ninguna empleado con ID {referencia}.")
+
+
 
 def centrar_ventana(ventana):
     ventana.update_idletasks()
@@ -155,63 +165,112 @@ def centrar_ventana(ventana):
     y = (ventana.winfo_screenheight() // 2) - (alto // 2)
     ventana.geometry(f"{ancho}x{alto}+{x}+{y}")
 
+# Registro de empleados (con contraseña cifrada)
+def registrar_empleado():
+    def confirmar():
+        empleado_id = int(entry_empleado_id.get())
+        permisos = int(entry_permisos.get())
+        password = entry_password.get()
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-#Menu Login
+        try:
+            cursor.execute("""
+                INSERT INTO Empleado_Contraseña (Empleado_ID, Password, Permisos)
+                VALUES (?, ?, ?)
+            """, (empleado_id, hashed_password, permisos))
+            conn.commit()
+            messagebox.showinfo("Éxito", "Registro exitoso.")
+            ventana_registro.destroy()
+        except sqlite3.IntegrityError:
+            messagebox.showerror("Error", "El Empleado ID ya está registrado.")
+        
+    def cancelar():
+        ventana_registro.destroy()
+
+    ventana_registro = Toplevel()
+    ventana_registro.title("Registrar Empleado")
+    ventana_registro.geometry("300x200")
+    centrar_ventana(ventana_registro)
+
+    Label(ventana_registro, text="Registrar Empleado", font="Helvetica").pack(pady=10)
+    Label(ventana_registro, text="Empleado ID:").pack()
+    entry_empleado_id = Entry(ventana_registro)
+    entry_empleado_id.pack()
+
+    Label(ventana_registro, text="Contraseña:").pack()
+    entry_password = Entry(ventana_registro, show="*")
+    entry_password.pack()
+
+    Label(ventana_registro, text="Permisos (0-3):").pack()
+    entry_permisos = Entry(ventana_registro)
+    entry_permisos.pack()
+
+    Button(ventana_registro, text="Confirmar", command=confirmar).pack(pady=5)
+    Button(ventana_registro, text="Cancelar", command=cancelar).pack(pady=5)
+
+# Verificar login
+def verificar_login(empleado_id, password):
+    cursor.execute("SELECT Password, Permisos FROM Empleado_Contraseña WHERE Empleado_ID = ?", (empleado_id,))
+    result = cursor.fetchone()
+    if result:
+        hashed_password, permisos = result
+        if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+            return True, permisos
+    return False, None
+
+# Modificar el login actual
+def login_verify():
+    global username_entry1, password_entry1, ventana_login  # Aseguramos que las variables sean accesibles
+    empleado_id = username_verify.get()
+    password = password_verify.get()
+
+    # Limpiar las entradas después de obtener los valores
+    username_entry1.delete(0, END)
+    password_entry1.delete(0, END)
+
+    # Verificar las credenciales
+    valido, permisos = verificar_login(empleado_id, password)
+    if valido:
+        global id_empleado_logueado, permisos_empleado
+        id_empleado_logueado = empleado_id
+        permisos_empleado = permisos
+        ventana_login.destroy()  # Cerrar la ventana de login
+        menu_cobranzas()  # Abrir el menú de cobranzas
+    else:
+        messagebox.showwarning("Error", "Usuario o contraseña incorrectos.")
+
+# Modificar la ventana de login
 def menu_login():
-    def login_verify():
-        username1 = username_verify.get()
-        password1 = password_verify.get()
-        username_entry1.delete(0, END)
-        password_entry1.delete(0, END)
+    global username_entry1, password_entry1, ventana_login  # Declaramos como global
 
-
-        list_of_files = os.listdir()
-        if username1 in list_of_files:
-            file1 = open(username1, "r")
-            verify = file1.read().splitlines()
-            if password1 in verify:
-                ventana_login.destroy()
-                menu_cobranzas()
-            else:
-                messagebox.showwarning("Incorrecto","Usuario o contraseña erroneos, intentelo denuevo.")
-
-        else:
-            messagebox.showwarning("Incorrecto","Usuario o contraseña erroneos, intentelo denuevo.")
-
-
-    
-    ventana_login = tk.Tk()
+    ventana_login = tk.Tk()  # Creamos la ventana principal
     ventana_login.title("Control Cobranzas v1.0")
     ventana_login.geometry("300x250")
     centrar_ventana(ventana_login)
-    Label(ventana_login, text = "Por favor ingrese sus datos para continuar.").pack()
-    Label(ventana_login, text = "").pack()
 
+    Label(ventana_login, text="Por favor ingrese sus datos para continuar.").pack(pady=10)
 
-    global username_verify
-    global password_verify
-    
+    # Variables para capturar el ID y contraseña
+    global username_verify, password_verify
     username_verify = StringVar()
     password_verify = StringVar()
 
-
-    global username_entry1
-    global password_entry1
-    
-    Label(ventana_login, text = "Usuario * ").pack()
-    username_entry1 = Entry(ventana_login, textvariable = username_verify)
+    # Campos para ID y contraseña
+    Label(ventana_login, text="Empleado ID:").pack()
+    username_entry1 = Entry(ventana_login, textvariable=username_verify)
     username_entry1.pack()
-    Label(ventana_login, text = "").pack()
-    Label(ventana_login, text = "Contraseña * ").pack()
-    password_entry1 = Entry(ventana_login, textvariable = password_verify)
+
+    Label(ventana_login, text="Contraseña:").pack()
+    password_entry1 = Entry(ventana_login, textvariable=password_verify, show="*")
     password_entry1.pack()
-    Label(ventana_login, text = "").pack()
-    Button(ventana_login, text = "Iniciar Sesion", width = 10, height = 1, command = login_verify).pack()
 
-    password_entry1.bind('<Return>', lambda event: login_verify())  
+    # Botones para iniciar sesión y registrarse
+    Button(ventana_login, text="Iniciar Sesión", command=login_verify).pack(pady=5)
+    Button(ventana_login, text="Registrarse", command=registrar_empleado).pack(pady=5)
 
+    # Asociar la tecla Enter al login
+    password_entry1.bind('<Return>', lambda event: login_verify())
     ventana_login.mainloop()
-        
 
 # Menu de cobranzas en Tkinter
 def menu_cobranzas():
@@ -542,6 +601,6 @@ def menu_cobranzas():
     menu.mainloop()
 
 if __name__ == "__main__":
-    #menu_login() #Descomentar para que funcione el login -> User: admin | Password: 1
-    menu_cobranzas()
+    menu_login() #Descomentar para que funcione el login -> User: admin | Password: 1
+    #menu_cobranzas()
     conn.close()
