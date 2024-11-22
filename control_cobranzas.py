@@ -19,15 +19,19 @@ def descuento_membresia(usuario_id) -> int:
     mult_membresia = 1
     cursor.execute('SELECT * FROM Usuarios WHERE DNI = ?', (usuario_id,))
     usuario = cursor.fetchone()
-    membresia_id = usuario[5]
-    fecha_vencimiento = usuario[6]
-    date_vencimiento = datetime.strptime(fecha_vencimiento, '%Y-%m-%d').date()
-    date_actual = datetime.now().date()
-    if(date_vencimiento < date_actual):
-        cursor.execute('SELECT * FROM Membresia WHERE ID = ?', (membresia_id,))
-        membresia = cursor.fetchone
-        if membresia is not None:
-            mult_membresia = membresia[2]
+    if usuario is not None:
+        membresia_id = usuario[5]
+        fecha_vencimiento = usuario[6]
+        date_vencimiento = datetime.strptime(fecha_vencimiento, '%Y-%m-%d').date()
+        date_actual = datetime.now().date()
+        if(date_vencimiento > date_actual):
+            print("Membresia valida")
+            print(membresia_id)
+            cursor.execute('SELECT * FROM Membresia WHERE ID = ?', (membresia_id,))
+            membresia = cursor.fetchone()
+            if membresia is not None:
+                mult_membresia = membresia[2]
+                print(mult_membresia)
     return mult_membresia
 
 
@@ -49,8 +53,9 @@ def alta_cobranza(Usuario) -> int:
     cobranza_id = cursor.lastrowid
     return cobranza_id
 
-def cobrar_cobranza(ingreso, egreso, cobranza, reserva):
+def cobrar_cobranza(ingreso, egreso, cobranza_id, reserva):
     fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    mult_membresia = 1
     mult_reserva = 1
     if reserva:
         mult_reserva = 0.9
@@ -67,11 +72,8 @@ def cobrar_cobranza(ingreso, egreso, cobranza, reserva):
         moneda = 'ARS'
 
     # Consulta del usuario y su membresia
-    usuario_cobranza = consultar_cobranza_por_id(cobranza)
-    if usuario_cobranza is None:
-        print("No se encontro el usuario")
-        return
-    usuario_id = usuario_cobranza[1]
+    cobranza = consultar_cobranza_por_id(cobranza_id)
+    usuario_id = cobranza[1]
     mult_membresia = descuento_membresia(usuario_id)
     monto_final = monto_base*mult_reserva*mult_membresia
     
@@ -80,7 +82,7 @@ def cobrar_cobranza(ingreso, egreso, cobranza, reserva):
         UPDATE Cobranzas
         SET Monto = ?, Moneda = ?, Fecha_Hora = ?, Empleado_ID = ?
         WHERE ID = ?
-    """, (monto_final, moneda, fecha_hora, id_empleado_logueado, cobranza))
+    """, (monto_final, moneda, fecha_hora, id_empleado_logueado, cobranza_id))
     conn.commit()
 
 def pagar_cobranza(cobranza):
@@ -88,7 +90,7 @@ def pagar_cobranza(cobranza):
         UPDATE Cobranzas
         SET Estado = 'Pagado'
         WHERE ID = ?
-    """, (cobranza))
+    """, (cobranza,))
     conn.commit()
 
 
@@ -138,6 +140,7 @@ def consultar_cobranza_por_referencia(referencia):
     else:
         print(f"No se encontro ninguna cobranza con ID {referencia}.")
 
+
 #Consulta una cobranza por ID
 def consultar_cobranza_por_id(referencia):
     cursor.execute('SELECT * FROM cobranzas WHERE ID LIKE ?', (referencia,))
@@ -146,6 +149,7 @@ def consultar_cobranza_por_id(referencia):
         return result
     else:
         print(f"No se encontro ninguna cobranza con ID {referencia}.")
+
 
 def consultar_empleado_por_id(referencia):
     cursor.execute('SELECT * FROM empleados WHERE DNI LIKE ?', (referencia,))
@@ -156,6 +160,13 @@ def consultar_empleado_por_id(referencia):
         print(f"No se encontro ninguna empleado con ID {referencia}.")
 
 
+def consultar_usuario_por_id(referencia):
+    cursor.execute('SELECT * FROM usuarios WHERE DNI LIKE ?', (referencia,))
+    result = cursor.fetchone()
+    if result:
+        return result
+    else:
+        print(f"No se encontro ninguna usuario con ID {referencia}.")
 
 def centrar_ventana(ventana):
     ventana.update_idletasks()
@@ -165,6 +176,7 @@ def centrar_ventana(ventana):
     y = (ventana.winfo_screenheight() // 2) - (alto // 2)
     ventana.geometry(f"{ancho}x{alto}+{x}+{y}")
 
+
 # Registro de empleados (con contraseña cifrada)
 def registrar_empleado():
     def confirmar():
@@ -173,16 +185,20 @@ def registrar_empleado():
         password = entry_password.get()
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        try:
-            cursor.execute("""
-                INSERT INTO Empleado_Contraseña (Empleado_ID, Password, Permisos)
-                VALUES (?, ?, ?)
-            """, (empleado_id, hashed_password, permisos))
-            conn.commit()
-            messagebox.showinfo("Éxito", "Registro exitoso.")
-            ventana_registro.destroy()
-        except sqlite3.IntegrityError:
-            messagebox.showerror("Error", "El Empleado ID ya está registrado.")
+        empleado_existente = consultar_empleado_por_id(empleado_id)
+        if (empleado_existente is not None):
+            try:
+                cursor.execute("""
+                    INSERT INTO Empleado_Contraseña (Empleado_ID, Password, Permisos)
+                    VALUES (?, ?, ?)
+                """, (empleado_id, hashed_password, permisos))
+                conn.commit()
+                messagebox.showinfo("Éxito", "Registro exitoso.")
+                ventana_registro.destroy()
+            except sqlite3.IntegrityError:
+                messagebox.showerror("Error", "El Empleado ID ya está registrado.")
+        else:
+            messagebox.showerror("Error", "El Empleado ID especificado no existe.")
         
     def cancelar():
         ventana_registro.destroy()
@@ -227,7 +243,7 @@ def login_verify():
     # Limpiar las entradas después de obtener los valores
     username_entry1.delete(0, END)
     password_entry1.delete(0, END)
-
+    
     # Verificar las credenciales
     valido, permisos = verificar_login(empleado_id, password)
     if valido:
@@ -354,7 +370,7 @@ def menu_cobranzas():
         Label(menu_agregar, text = "Ingrese los datos de la nueva cobranza", justify=tk.CENTER).grid(row=0, column=0, columnspan=2, pady=5,padx=5)
 
         Label(menu_agregar, text="DNI Usuario:").grid(row=1, column=0, sticky=tk.E,pady=5,padx=5)
-
+        
         nuevo_usuario = Entry(menu_agregar)
         nuevo_usuario.grid(row=1, column=1,sticky=tk.W)
 
@@ -453,6 +469,8 @@ def menu_cobranzas():
             pagar_cobranza(id_cobranza)
             limpiar_tabla()
             buscar_todos_disponibles()
+        else:
+            messagebox.showwarning("Error",f"Pago incorrecto o cobranza inexistente.")
 
     #Modificacion de cobranza
     def modificar():
@@ -601,6 +619,6 @@ def menu_cobranzas():
     menu.mainloop()
 
 if __name__ == "__main__":
-    menu_login() #Descomentar para que funcione el login -> User: admin | Password: 1
+    menu_login()
     #menu_cobranzas()
     conn.close()
