@@ -16,6 +16,15 @@ permisos_empleado = 1
 
 
 def descuento_membresia(usuario_id) -> int:
+    """
+    Calcula el multiplicador de descuento basado en la membresía de un usuario.
+
+    Args:
+        usuario_id (int): Identificación del usuario.
+
+    Returns:
+        int: Multiplicador correspondiente a la membresía, o 1 si no aplica descuento.
+    """
     mult_membresia = 1
     cursor.execute('SELECT * FROM Usuarios WHERE DNI = ?', (usuario_id,))
     usuario = cursor.fetchone()
@@ -36,6 +45,16 @@ def descuento_membresia(usuario_id) -> int:
 
 
 def roundUP_horas(ingreso: str, egreso: str) -> int:
+    """
+    Calcula la cantidad de horas entre dos fechas redondeando hacia arriba.
+
+    Args:
+        ingreso (str): Fecha y hora de ingreso en formato "YYYY-MM-DD HH:MM:SS".
+        egreso (str): Fecha y hora de egreso en el mismo formato.
+
+    Returns:
+        int: Cantidad de horas redondeadas hacia arriba.
+    """
     ingreso_dt = datetime.strptime(ingreso, "%Y-%m-%d %H:%M:%S")
     egreso_dt = datetime.strptime(egreso, "%Y-%m-%d %H:%M:%S")
     diferencia = egreso_dt - ingreso_dt
@@ -43,6 +62,15 @@ def roundUP_horas(ingreso: str, egreso: str) -> int:
     return math.ceil(total_horas)
 
 def alta_cobranza(Usuario) -> int:
+    """
+    Registra una nueva cobranza en la base de datos.
+
+    Args:
+        Usuario (int): DNI del usuario.
+
+    Returns:
+        int: ID de la cobranza recién creada.
+    """
     fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute("""
     INSERT INTO Cobranzas (Usuario_ID, Fecha_Hora)
@@ -54,6 +82,15 @@ def alta_cobranza(Usuario) -> int:
     return cobranza_id
 
 def cobrar_cobranza(ingreso, egreso, cobranza_id, reserva):
+    """
+    Calcula y actualiza el monto de una cobranza.
+
+    Args:
+        ingreso (str): Fecha y hora de ingreso.
+        egreso (str): Fecha y hora de egreso.
+        cobranza_id (int): ID de la cobranza.
+        reserva (bool): Indica si se aplica descuento por reserva.
+    """
     fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     mult_membresia = 1
     mult_reserva = 1
@@ -86,6 +123,12 @@ def cobrar_cobranza(ingreso, egreso, cobranza_id, reserva):
     conn.commit()
 
 def pagar_cobranza(cobranza):
+    """
+    Cambia el estado de una cobranza a "Pagado".
+
+    Args:
+        cobranza (int): ID de la cobranza.
+    """
     cursor.execute("""
         UPDATE Cobranzas
         SET Estado = 'Pagado'
@@ -95,6 +138,12 @@ def pagar_cobranza(cobranza):
 
 
 def baja_cobranza(cobranza):
+    """
+    Marca una cobranza como eliminada en la base de datos.
+
+    Args:
+        cobranza (int): ID de la cobranza.
+    """
     cursor.execute("""
         UPDATE Cobranzas
         SET Estado = 'Eliminado', Empleado_ID = ?
@@ -104,6 +153,15 @@ def baja_cobranza(cobranza):
 
 
 def modificar_cobranza(cobranza_id, nuevo_monto, nueva_moneda, nuevo_empleado_id):
+    """
+    Modifica los datos de una cobranza existente.
+
+    Args:
+        cobranza_id (int): ID de la cobranza.
+        nuevo_monto (float): Nuevo monto a asignar.
+        nueva_moneda (str): Nueva moneda del monto.
+        nuevo_empleado_id (int): ID del empleado que realiza el cambio.
+    """
     fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute("""
         UPDATE Cobranzas
@@ -118,6 +176,12 @@ def modificar_cobranza(cobranza_id, nuevo_monto, nueva_moneda, nuevo_empleado_id
 
 #Consulta todas las cobranzas existentes
 def consultar_cobranzas_disponibles():
+    """
+    Recupera todas las cobranzas disponibles que no están eliminadas.
+
+    Returns:
+        list: Lista de cobranzas disponibles.
+    """
     cursor.execute("""
         SELECT * FROM Cobranzas
         WHERE ESTADO NOT LIKE ?
@@ -126,6 +190,12 @@ def consultar_cobranzas_disponibles():
     return cobranzas
 
 def consultar_cobranzas():
+    """
+    Recupera todas las cobranzas sin filtrar por estado.
+
+    Returns:
+        list: Lista de todas las cobranzas.
+    """
     cursor.execute("SELECT * FROM Cobranzas")
     cobranzas = cursor.fetchall()
     return cobranzas
@@ -133,6 +203,15 @@ def consultar_cobranzas():
 
 #Consulta una cobranza por referencia de ID o DNI de usuario
 def consultar_cobranza_por_referencia(referencia):
+    """
+    Recupera una cobranza por ID o por DNI del usuario.
+
+    Args:
+        referencia (str): ID de la cobranza o DNI del usuario.
+
+    Returns:
+        tuple or None: Datos de la cobranza o None si no existe.
+    """
     cursor.execute('SELECT * FROM cobranzas WHERE ID LIKE ? OR Usuario_ID LIKE ?', (referencia,referencia))
     result = cursor.fetchone()
     if result:
@@ -143,6 +222,15 @@ def consultar_cobranza_por_referencia(referencia):
 
 #Consulta una cobranza por ID
 def consultar_cobranza_por_id(referencia):
+    """
+    Recupera una cobranza por su ID.
+
+    Args:
+        referencia (str): ID de la cobranza.
+
+    Returns:
+        tuple or None: Datos de la cobranza o None si no existe.
+    """
     cursor.execute('SELECT * FROM cobranzas WHERE ID LIKE ?', (referencia,))
     result = cursor.fetchone()
     if result:
@@ -152,6 +240,15 @@ def consultar_cobranza_por_id(referencia):
 
 
 def consultar_empleado_por_id(referencia):
+    """
+    Recupera un empleado por su DNI.
+
+    Args:
+        referencia (str): DNI del empleado.
+
+    Returns:
+        tuple or None: Datos del empleado o None si no existe.
+    """
     cursor.execute('SELECT * FROM empleados WHERE DNI LIKE ?', (referencia,))
     result = cursor.fetchone()
     if result:
@@ -161,6 +258,15 @@ def consultar_empleado_por_id(referencia):
 
 
 def consultar_usuario_por_id(referencia):
+    """
+    Recupera un usuario por su DNI.
+
+    Args:
+        referencia (str): DNI del usuario.
+
+    Returns:
+        tuple or None: Datos del usuario o None si no existe.
+    """
     cursor.execute('SELECT * FROM usuarios WHERE DNI LIKE ?', (referencia,))
     result = cursor.fetchone()
     if result:
@@ -169,6 +275,12 @@ def consultar_usuario_por_id(referencia):
         print(f"No se encontro ninguna usuario con ID {referencia}.")
 
 def centrar_ventana(ventana):
+    """
+    Centra una ventana de Tkinter en la pantalla.
+
+    Args:
+        ventana (tk.Tk or tk.Toplevel): Ventana a centrar.
+    """
     ventana.update_idletasks()
     ancho = ventana.winfo_width()
     alto = ventana.winfo_height()
@@ -179,6 +291,9 @@ def centrar_ventana(ventana):
 
 # Registro de empleados (con contraseña cifrada)
 def registrar_empleado():
+    """
+    Muestra un formulario para registrar un nuevo empleado con contraseña cifrada.
+    """
     def confirmar():
         empleado_id = int(entry_empleado_id.get())
         permisos = int(entry_permisos.get())
@@ -226,6 +341,16 @@ def registrar_empleado():
 
 # Verificar login
 def verificar_login(empleado_id, password):
+    """
+    Verifica las credenciales de un empleado.
+
+    Args:
+        empleado_id (int): ID del empleado.
+        password (str): Contraseña ingresada.
+
+    Returns:
+        tuple: (bool, int) - True y permisos si la verificación es exitosa; False y None si falla.
+    """
     cursor.execute("SELECT Password, Permisos FROM Empleado_Contraseña WHERE Empleado_ID = ?", (empleado_id,))
     result = cursor.fetchone()
     if result:
@@ -236,6 +361,9 @@ def verificar_login(empleado_id, password):
 
 # Modificar el login actual
 def login_verify():
+    """
+    Verifica las credenciales ingresadas en el formulario de inicio de sesión.
+    """
     global username_entry1, password_entry1, ventana_login  # Aseguramos que las variables sean accesibles
     empleado_id = username_verify.get()
     password = password_verify.get()
@@ -257,6 +385,9 @@ def login_verify():
 
 # Modificar la ventana de login
 def menu_login():
+    """
+    Crea el formulario de inicio de sesión con opciones para registrarse.
+    """
     global username_entry1, password_entry1, ventana_login  # Declaramos como global
 
     ventana_login = tk.Tk()  # Creamos la ventana principal
@@ -290,7 +421,9 @@ def menu_login():
 
 # Menu de cobranzas en Tkinter
 def menu_cobranzas():
-
+    """
+    Interfaz principal de gestión de cobranzas con opciones de alta, baja, modificación y consulta.
+    """
     # Crea una tabla de la base de datos
     def crear_tabla(ventana):
         columnas = ("id", "usuario", "monto", "moneda", "fecha", "empleado","estado")
@@ -620,5 +753,4 @@ def menu_cobranzas():
 
 if __name__ == "__main__":
     menu_login()
-    #menu_cobranzas()
     conn.close()
