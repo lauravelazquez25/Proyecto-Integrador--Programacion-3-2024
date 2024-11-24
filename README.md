@@ -1,35 +1,45 @@
 # Proyecto-Integrador--Programacion-3-2024
 
-Proyecto Grupal – Enunciado del Problema 1
-### Gestión de Estacionamiento.
+## Proyecto Grupal – Enunciado del Problema 1
 
-Una empresa dueña de un estacionamiento está interesada en automatizar la gestión de su actividad y para esto se pide codificar un programa en Python, teniendo en cuenta lo siguiente:
+### Gestión de Estacionamiento
 
-Según el enunciado del problema y siguiendo la distribución de las preguntas para cada uno de los estudiantes del grupo, se solicita:
+Una empresa dueña de un estacionamiento está interesada en automatizar la gestión de su actividad. Este proyecto tiene como objetivo desarrollar un sistema en Python para cubrir las necesidades descritas en el enunciado, incluyendo las siguientes tareas principales:
 
-•
-Crear la base de datos en MS ACCESS o similar, para automatizar la gestión de estacionamientos
-•
-Generar las sentencias de creación de tablas y relaciones
-•
-Crear las tablas con los campos de cada una según su modelo físico (considere PK y FK)
-•
-Crear las relaciones entre las tablas
-•
-Ingresar al menos 5 registros de ejemplo en cada una de las tablas
-Además, se debe integrar las bases de datos de todos los grupos en una única base de datos.
+1. Crear la base de datos en SQLite o similar, para automatizar la gestión de estacionamientos.
+2. Generar las sentencias de creación de tablas y relaciones.
+3. Crear las tablas con los campos de cada una según su modelo físico (considerando PK y FK).
+4. Crear las relaciones entre las tablas.
+5. Ingresar al menos 5 registros de ejemplo en cada una de las tablas.
+6. Integrar las bases de datos de todos los grupos en una única base de datos consolidada.
 
-# Proyecto de Gestión de Cobranzas
+---
 
-Este proyecto permite gestionar cobranzas en un sistema de estacionamiento. Incluye funcionalidades para registrar, eliminar, modificar y consultar cobranzas en una base de datos SQLite.
+## Proyecto de Gestión de Cobranzas
+
+Este proyecto forma parte de la gestión del estacionamiento y está enfocado en el manejo de las cobranzas. Permite registrar, eliminar, modificar y consultar cobranzas utilizando una base de datos SQLite. Además, implementa un sistema de roles y permisos para garantizar la seguridad y accesibilidad del sistema.
+
+---
 
 ## Características
 
-- **Registro de Cobranzas**: Añade nuevas cobranzas con información detallada.
-- **Eliminación de Cobranzas**: Elimina registros específicos de cobranzas.
-- **Modificación de Cobranzas**: Actualiza los detalles de una cobranza ya registrada.
-- **Consulta de Cobranzas**: Permite visualizar todas las cobranzas registradas o consultar una específica por su ID.
-- **Interfaz de Línea de Comandos (CLI)**: Un menú interactivo que permite al usuario acceder a las funcionalidades del sistema.
+### Funcionalidades principales
+- **Registro de Cobranzas**: Agrega nuevas cobranzas con detalles como usuario, monto y fecha.
+- **Cobro y Pago de Cobranzas**: Calcula montos finales considerando descuentos por membresías y reservas, y permite marcar cobranzas como pagadas.
+- **Eliminación de Cobranzas**: Realiza una eliminación lógica de cobranzas específicas.
+- **Modificación de Cobranzas**: Permite actualizar los detalles de una cobranza existente.
+- **Consulta de Cobranzas**: Visualiza todas las cobranzas activas o busca cobranzas específicas por ID.
+- **Sistema de Login**: Registra y autentica empleados con contraseñas cifradas (`bcrypt`), asignando roles según permisos.
+- **Descuentos Avanzados**: Aplica descuentos automáticos basados en membresías y reservas.
+- **Interfaz Gráfica**: Desarrollada con `Tkinter` para facilitar el uso del sistema.
+
+### Modularidad
+El proyecto está diseñado de manera modular, lo que permite la reutilización de componentes como:
+- **Gestión de Contraseñas**: Registro y autenticación segura.
+- **Cálculo de Tarifas**: Lógica de redondeo de horas y aplicación de descuentos.
+- **Interfaz de Búsqueda**: Tabla interactiva reutilizable para mostrar resultados.
+
+---
 
 ## Requisitos
 
